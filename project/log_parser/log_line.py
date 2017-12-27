@@ -1,6 +1,8 @@
 from re import search
 from datetime import datetime
 from time import strptime,mktime
+import base64
+
 
 class LogLine(object):
 
@@ -8,6 +10,7 @@ class LogLine(object):
     events = []
     
     def __init__(self, line):
+        self.hash = base64.b64encode(hashlib.md5(line).digest())
         self.line = line
      
     def search(self,rx):
@@ -19,10 +22,10 @@ class LogLine(object):
             return False
 
     def getDate(self):
-        s = self.search("^\[(.*?)\.")
+        s = self.search("^\[(.*?)\]")
         d=False
         if s:
-            t = strptime(s, '%Y/%m/%d %H:%M:%S')
+            t = strptime(s, '%Y/%m/%d %H:%M:%S.%f')
             d = datetime.fromtimestamp(mktime(t))
         return d
     
